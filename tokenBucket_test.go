@@ -1,6 +1,7 @@
 package limiter
 
 import (
+	"sync"
 	"testing"
 	"time"
 )
@@ -48,5 +49,30 @@ func TestAllow_SeparateKeysIndependent(t *testing.T) {
 	}
 	if !l.Allow("client2") {
 		t.Fatalf("client2 should have its own bucket, unaffected by client1")
+	}
+}
+
+func TestAllow_ConcurrentAccess(t *testing.T) {
+	l := NewTokenBucketLimiter(100, 1)
+	var wg sync.WaitGroup
+	var mu sync.Mutex
+	allowedCount := 0
+
+	for i := 0; i < 150; i++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			if l.Allow("client1") {
+				mu.Lock()
+				allowedCount++
+				mu.Unlock()
+			}
+		}()
+	}
+
+	wg.Wait()
+
+	if allowedCount != 100 {
+		t.Fatalf("expected exactly 100 allowed requests, got %d", allowedCount)
 	}
 }
