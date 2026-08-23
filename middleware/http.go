@@ -8,7 +8,7 @@ import (
 
 type KeyFunc func(r *http.Request) string
 
-func RateLimit(l limiter.Limiter, KeyFunc KeyFunc) func(http, http.Handler) http.Handler {
+func RateLimit(l limiter.Limiter, KeyFunc KeyFunc) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			key := KeyFunc(r)
