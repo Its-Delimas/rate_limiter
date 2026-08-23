@@ -49,3 +49,6 @@ go test -race ./
 ```bash
 ok      github.com/Its-Delimas/rate_limiter     (cached)
 ```
+## License
+
+Apache 2.0 - see [LICENSE](LICENSE)
